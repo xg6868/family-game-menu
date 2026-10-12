@@ -579,7 +579,7 @@ THEMES = {
         "grid": (0, 255, 255, 22),
         "accent": "#00ffff",
         "accent_rgb": (0, 255, 255),
-        "builtin_bg": False,
+        "builtin_bg": True,
     },
     "sci_fi_space": {
         "name": "3A·艾尔登法环",
@@ -588,7 +588,7 @@ THEMES = {
         "grid": (255, 200, 50, 20),
         "accent": "#ffcc33",
         "accent_rgb": (255, 204, 51),
-        "builtin_bg": False,
+        "builtin_bg": True,
     },
     "sci_fi_cyber": {
         "name": "3A·巫师3",
@@ -597,7 +597,7 @@ THEMES = {
         "grid": (100, 200, 100, 22),
         "accent": "#88cc66",
         "accent_rgb": (136, 204, 102),
-        "builtin_bg": False,
+        "builtin_bg": True,
     },
     "sci_fi_mecha": {
         "name": "3A·战神",
@@ -606,7 +606,7 @@ THEMES = {
         "grid": (100, 200, 255, 20),
         "accent": "#66ccff",
         "accent_rgb": (102, 204, 255),
-        "builtin_bg": False,
+        "builtin_bg": True,
     },
     "sci_fi_matrix": {
         "name": "3A·最后生还者",
@@ -615,7 +615,7 @@ THEMES = {
         "grid": (150, 200, 100, 22),
         "accent": "#99cc66",
         "accent_rgb": (153, 204, 102),
-        "builtin_bg": False,
+        "builtin_bg": True,
     },
     "cat_white": {
         "name": "3A·荒野大镖客",
@@ -624,7 +624,7 @@ THEMES = {
         "grid": (255, 200, 100, 20),
         "accent": "#ffaa44",
         "accent_rgb": (255, 170, 68),
-        "builtin_bg": False,
+        "builtin_bg": True,
     },
     "cat_orange": {
         "name": "3A·黑暗之魂",
@@ -633,7 +633,7 @@ THEMES = {
         "grid": (200, 100, 50, 20),
         "accent": "#cc6633",
         "accent_rgb": (204, 102, 51),
-        "builtin_bg": False,
+        "builtin_bg": True,
     },
     "cat_black": {
         "name": "3A·黑神话悟空",
@@ -642,7 +642,7 @@ THEMES = {
         "grid": (200, 180, 100, 20),
         "accent": "#ccaa44",
         "accent_rgb": (204, 170, 68),
-        "builtin_bg": False,
+        "builtin_bg": True,
     },
     "cat_pink": {
         "name": "3A·星际战甲",
@@ -651,7 +651,7 @@ THEMES = {
         "grid": (50, 150, 255, 22),
         "accent": "#3399ff",
         "accent_rgb": (51, 153, 255),
-        "builtin_bg": False,
+        "builtin_bg": True,
     },
     "cat_green": {
         "name": "3A·合金装备",
@@ -660,7 +660,7 @@ THEMES = {
         "grid": (100, 150, 100, 20),
         "accent": "#66aa66",
         "accent_rgb": (102, 170, 102),
-        "builtin_bg": False,
+        "builtin_bg": True,
     }
 }
 
@@ -3853,6 +3853,35 @@ class BackgroundWidget(QWidget):
                 "cyberpunk": ("cyberpunk_bg.jpg", ANIME_BG_CYBERPUNK),
                 "cs": ("cs_bg.jpg", ANIME_BG_CS),
             }
+            # 3A游戏主题：直接使用menu_assets目录里的jpg文件（无需base64）
+            _3a_map = {
+                "sci_fi_night": "sci_fi_night.jpg",
+                "sci_fi_space": "sci_fi_space.jpg",
+                "sci_fi_cyber": "sci_fi_cyber.jpg",
+                "sci_fi_mecha": "sci_fi_mecha.jpg",
+                "sci_fi_matrix": "sci_fi_matrix.jpg",
+                "cat_white": "cat_white.jpg",
+                "cat_orange": "cat_orange.jpg",
+                "cat_black": "cat_black.jpg",
+                "cat_pink": "cat_pink.jpg",
+                "cat_green": "cat_green.jpg",
+            }
+            if self.theme_key in _3a_map:
+                # 3A壁纸：直接从base64数据加载（不依赖文件路径）
+                try:
+                    from themes_3a_data import THEME_3A_DATA
+                    _b64data = THEME_3A_DATA.get(self.theme_key, "")
+                    if _b64data:
+                        dest = os.path.join(assets, _3a_map[self.theme_key])
+                        with open(dest, "wb") as f:
+                            f.write(_b64.b64decode(_b64data))
+                        if os.path.exists(dest) and os.path.getsize(dest) > 1000:
+                            self._builtin_bg_loaded = True
+                            self.set_background(dest)
+                            self._bg_is_builtin = True
+                            return
+                except Exception:
+                    pass
             _fname, _b64data = _map.get(self.theme_key, ("anime_bg.jpg", ANIME_BG_B64))
             dest = os.path.join(assets, _fname)
             # 始终用内置最新图覆盖旧文件（强制覆盖，不检查大小，避免旧图残留）
@@ -5680,9 +5709,11 @@ class SettingsDialog(QDialog):
 
         changelog = [
             ("v7.3.18 - 最新版本", [
-                "✓ 原神主题改为黑神话悟空壁纸",
-                "✓ 漂浮特效新增10种：闪电/烟花/绿叶/雪花/金币/音符/极光/糖果/羽毛/彗星",
-                "✓ 优化性能：粒子数量和更新频率调整，减少内存占用",
+                "✓ 修复3A游戏壁纸主题全部显示同一张图片的问题",
+                "✓ 暗色蒙版减轻，壁纸画面更清晰可见",
+                "✓ 游戏菜单和安装包图标升级为高清256x256",
+                "✓ 开源仓库已上传GitHub：github.com/xg6868/family-game-menu",
+                "✓ 安装包优化到97MB，100MB以下",
             ]),
             ("v7.3.17", [
                 "✓ 新增10个3A游戏壁纸主题：赛博朋克2077/艾尔登法环/巫师3等",
@@ -6269,6 +6300,44 @@ class SettingsDialog(QDialog):
         _tab5_scroll.setWidget(_tab5_container)
         _tab5_outer.addWidget(_tab5_scroll)
         self.tabs.addTab(tab5, "📢 公告")
+
+        # ========== Tab 6: 开源获取 ==========
+        tab6 = QWidget()
+        t6 = QVBoxLayout(tab6)
+        t6.setContentsMargins(20, 20, 20, 20)
+        t6.setSpacing(12)
+
+        open_title = QLabel("═══  游戏菜单开源  ═══")
+        open_title.setStyleSheet("font-size:16px; font-weight:bold; color:#ffffff;")
+        open_title.setAlignment(Qt.AlignCenter)
+        t6.addWidget(open_title)
+
+        open_desc = QLabel(
+            "雪之下倾城·家庭版游戏菜单已开源，欢迎学习和贡献代码。\n\n"
+            "🔗 GitHub仓库：\n"
+        )
+        open_desc.setStyleSheet("font-size:13px; color:rgba(255,255,255,220);")
+        open_desc.setWordWrap(True)
+        t6.addWidget(open_desc)
+
+        open_link = QLabel('<a href="https://github.com/xg6868/family-game-menu" style="color:#ff77c9; font-size:14px; font-weight:bold;">https://github.com/xg6868/family-game-menu</a>')
+        open_link.setOpenExternalLinks(True)
+        open_link.setTextFormat(Qt.RichText)
+        open_link.setStyleSheet("font-size:14px; padding:10px; background:rgba(255,119,201,20); border-radius:8px;")
+        t6.addWidget(open_link)
+
+        open_info = QLabel(
+            "\n📦 技术栈：Python 3.12 + PySide6 (Qt6)\n"
+            "📄 许可证：开源免费\n"
+            "🌐 官网：http://xgadmin520.3vkj.vip/\n\n"
+            "点击上方链接查看完整源码。"
+        )
+        open_info.setStyleSheet("font-size:12px; color:rgba(255,255,255,180);")
+        open_info.setWordWrap(True)
+        t6.addWidget(open_info)
+        t6.addStretch()
+
+        self.tabs.addTab(tab6, "📦 开源获取")
 
         lay.addWidget(self.tabs, 1)
 
