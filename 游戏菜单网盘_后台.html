@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏菜单网盘 - 后台管理</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a0a1a 100%);
+    font-family: 'Microsoft YaHei', sans-serif;
+    min-height: 100vh; padding: 20px; color: #fff;
+}
+.header { text-align: center; margin-bottom: 30px; }
+.header h1 {
+    font-size: 28px;
+    background: linear-gradient(90deg, #ff33aa, #aa55ff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+}
+.login-box {
+    max-width: 400px; margin: 60px auto;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,51,170,0.3);
+    border-radius: 16px; padding: 30px;
+}
+.login-box h2 { text-align: center; margin-bottom: 20px; color: #ff33aa; }
+.login-box input {
+    width: 100%; padding: 12px; margin-bottom: 12px;
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(255,51,170,0.3);
+    border-radius: 8px; color: #fff; font-size: 14px;
+}
+.login-box input:focus { outline: none; border-color: #ff33aa; }
+.btn {
+    width: 100%; padding: 12px; border: none; border-radius: 8px;
+    background: linear-gradient(90deg, #ff33aa, #aa55ff);
+    color: #fff; font-size: 15px; cursor: pointer;
+}
+.btn:hover { opacity: 0.9; }
+.panel {
+    max-width: 800px; margin: 0 auto; display: none;
+}
+.setting-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,51,170,0.3);
+    border-radius: 12px; padding: 20px; margin-bottom: 16px;
+}
+.setting-card h3 { color: #ff33aa; margin-bottom: 16px; font-size: 16px; }
+.switch-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.switch-row:last-child { border-bottom: none; }
+.switch-label { font-size: 14px; }
+.switch-desc { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.switch {
+    position: relative; width: 50px; height: 26px;
+    background: rgba(0,0,0,0.4); border-radius: 13px;
+    cursor: pointer; transition: background 0.3s;
+}
+.switch.on { background: linear-gradient(90deg, #ff33aa, #aa55ff); }
+.switch::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 20px; height: 20px; background: #fff;
+    border-radius: 50%; transition: left 0.3s;
+}
+.switch.on::after { left: 27px; }
+.file-admin-item {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,51,170,0.2);
+    border-radius: 8px; padding: 12px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 12px;
+}
+.file-admin-item .info { flex: 1; }
+.file-admin-item .name { font-size: 14px; font-weight: bold; }
+.file-admin-item .meta { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.btn-small {
+    padding: 6px 12px; border: none; border-radius: 6px;
+    background: rgba(255,0,0,0.2); color: #ff6b6b;
+    cursor: pointer; font-size: 12px;
+}
+.btn-small:hover { background: rgba(255,0,0,0.4); }
+.toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(90deg, #ff33aa, #aa55ff); color: #fff;
+    padding: 12px 24px; border-radius: 8px; font-size: 14px;
+    z-index: 1000; display: none;
+}
+.link-main {
+    display: block; text-align: center; margin-top: 20px;
+    color: #7ee7ff; font-size: 13px; text-decoration: none;
+}
+.link-main:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>⚙️ 游戏菜单网盘 - 后台管理</h1>
+</div>
+
+<!-- 登录框 -->
+<div class="login-box" id="loginBox">
+    <h2>🔒 管理员登录</h2>
+    <input type="password" id="adminPassword" placeholder="请输入管理密码">
+    <button class="btn" onclick="login()">登录</button>
+</div>
+
+<!-- 管理面板 -->
+<div class="panel" id="adminPanel">
+    <div class="setting-card">
+        <h3>📋 上传设置</h3>
+        <div class="switch-row">
+            <div>
+                <div class="switch-label">允许上传文件</div>
+                <div class="switch-desc">关闭后访客无法上传文件</div>
+            </div>
+            <div class="switch on" id="switchUpload" onclick="toggleSetting('uploadEnabled', this)"></div>
+        </div>
+        <div class="switch-row">
+            <div>
+                <div class="switch-label">允许下载文件</div>
+                <div class="switch-desc">关闭后访客无法下载文件</div>
+            </div>
+            <div class="switch on" id="switchDownload" onclick="toggleSetting('downloadEnabled', this)"></div>
+        </div>
+        <div class="switch-row">
+            <div>
+                <div class="switch-label">显示文件列表</div>
+                <div class="switch-desc">关闭后访客看不到文件列表</div>
+            </div>
+            <div class="switch on" id="switchShowList" onclick="toggleSetting('showList', this)"></div>
+        </div>
+    </div>
+
+    <div class="setting-card">
+        <h3>🗂️ 文件管理</h3>
+        <div id="adminFileList">加载中...</div>
+    </div>
+
+    <a class="link-main" href="游戏菜单网盘.html">← 返回网盘主页</a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_PASSWORD = 'xzc520';
+const DB_NAME = 'GameMenuCloudDB';
+const STORE_NAME = 'files';
+const SETTINGS_KEY = 'cloudSettings';
+
+let db;
+
+function initDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+            }
+        };
+        request.onsuccess = (e) => { db = e.target.result; resolve(); };
+        request.onerror = (e) => reject(e);
+    });
+}
+
+function getSettings() {
+    try {
+        return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {
+            uploadEnabled: true,
+            downloadEnabled: true,
+            showList: true
+        };
+    } catch {
+        return { uploadEnabled: true, downloadEnabled: true, showList: true };
+    }
+}
+
+function saveSettings(settings) {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+function login() {
+    const pwd = document.getElementById('adminPassword').value;
+    if (pwd === ADMIN_PASSWORD) {
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadSettings();
+        loadFiles();
+    } else {
+        showToast('密码错误');
+    }
+}
+
+function loadSettings() {
+    const s = getSettings();
+    document.getElementById('switchUpload').classList.toggle('on', s.uploadEnabled);
+    document.getElementById('switchDownload').classList.toggle('on', s.downloadEnabled);
+    document.getElementById('switchShowList').classList.toggle('on', s.showList);
+}
+
+function toggleSetting(key, el) {
+    const s = getSettings();
+    s[key] = !s[key];
+    saveSettings(s);
+    el.classList.toggle('on', s[key]);
+    showToast('设置已保存');
+}
+
+function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+    if (bytes < 1073741824) return (bytes/1048576).toFixed(1) + ' MB';
+    return (bytes/1073741824).toFixed(2) + ' GB';
+}
+
+function getAllFiles() {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = (e) => reject(e);
+    });
+}
+
+function deleteFileDB(id) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).delete(id);
+        tx.oncomplete = () => resolve();
+        tx.onerror = (e) => reject(e);
+    });
+}
+
+async function loadFiles() {
+    const files = await getAllFiles();
+    const el = document.getElementById('adminFileList');
+    if (files.length === 0) {
+        el.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.3);padding:20px;">暂无文件</div>';
+        return;
+    }
+    el.innerHTML = files.map(f => `
+        <div class="file-admin-item">
+            <div class="info">
+                <div class="name">${f.name}</div>
+                <div class="meta">${formatSize(f.size)} · ${f.uploadTime}</div>
+            </div>
+            <button class="btn-small" onclick="deleteFile(${f.id})">删除</button>
+        </div>
+    `).join('');
+}
+
+async function deleteFile(id) {
+    if (!confirm('确定删除这个文件吗？')) return;
+    await deleteFileDB(id);
+    await loadFiles();
+    showToast('已删除');
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 2000);
+}
+
+// 回车登录
+document.getElementById('adminPassword').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') login();
+});
+
+initDB();
+</script>
+
+</body>
+</html>

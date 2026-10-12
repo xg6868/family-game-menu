@@ -1,0 +1,246 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>雪之下倾城 · 版本信息</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        background: linear-gradient(135deg, #1a0025 0%, #2d0040 50%, #1a0030 100%);
+        font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+        min-height: 100vh;
+        padding: 30px 16px;
+        color: #fff;
+        overflow-x: hidden;
+        position: relative;
+    }
+    body::before, body::after {
+        content: "";
+        position: fixed;
+        width: 320px; height: 320px;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.35;
+        pointer-events: none;
+        z-index: 0;
+    }
+    body::before { background: #ff33aa; top: -80px; left: -80px; animation: floatA 9s ease-in-out infinite; }
+    body::after { background: #7a2bff; bottom: -100px; right: -60px; animation: floatB 11s ease-in-out infinite; }
+    @keyframes floatA { 0%,100%{ transform: translate(0,0);} 50%{ transform: translate(50px,30px);} }
+    @keyframes floatB { 0%,100%{ transform: translate(0,0);} 50%{ transform: translate(-40px,-30px);} }
+    .page-title {
+        position: relative; z-index: 1;
+        text-align: center;
+        font-size: 30px;
+        color: #ff33aa;
+        letter-spacing: 6px;
+        margin-bottom: 4px;
+        text-shadow: 0 0 20px rgba(255, 51, 170, 0.6);
+        animation: glowPulse 2.6s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+        0%,100% { text-shadow: 0 0 16px rgba(255,51,170,.45); }
+        50% { text-shadow: 0 0 30px rgba(255,51,170,.9), 0 0 60px rgba(170,85,255,.5); }
+    }
+    .page-sub {
+        position: relative; z-index: 1;
+        text-align: center;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+        letter-spacing: 2px;
+        margin-bottom: 26px;
+    }
+    .card {
+        position: relative; z-index: 1;
+        max-width: 640px;
+        margin: 0 auto 22px;
+        background: rgba(20, 0, 35, 0.92);
+        border: 2px solid rgba(255, 51, 170, 0.45);
+        border-radius: 14px;
+        padding: 22px 26px;
+        backdrop-filter: blur(6px);
+        transition: border-color .3s, box-shadow .3s, transform .3s;
+    }
+    .card:hover {
+        border-color: rgba(255, 51, 170, 0.85);
+        box-shadow: 0 0 30px rgba(255, 51, 170, 0.25);
+        transform: translateY(-2px);
+    }
+    .card-title {
+        font-size: 15px;
+        color: #ff33aa;
+        font-weight: bold;
+        letter-spacing: 2px;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .card-title .tag {
+        background: rgba(255, 51, 170, 0.2);
+        border: 1px solid #ff33aa;
+        color: #ff77c9;
+        font-size: 11px;
+        padding: 1px 8px;
+        border-radius: 4px;
+        font-weight: normal;
+        letter-spacing: 0;
+    }
+    .info-row {
+        display: flex;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 51, 170, 0.25);
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+    }
+    .info-label {
+        color: #ff33aa;
+        font-weight: bold;
+        width: 90px;
+        flex-shrink: 0;
+        font-size: 14px;
+    }
+    .info-value {
+        color: #fff;
+        word-break: break-all;
+        flex: 1;
+        font-size: 15px;
+    }
+    .version-badge {
+        display: inline-block;
+        background: linear-gradient(90deg, #ff33aa, #aa55ff);
+        color: #fff;
+        font-size: 20px;
+        font-weight: bold;
+        padding: 2px 16px;
+        border-radius: 6px;
+        letter-spacing: 1px;
+        box-shadow: 0 0 18px rgba(255, 51, 170, 0.55);
+        animation: badgeGlow 2s ease-in-out infinite;
+    }
+    @keyframes badgeGlow {
+        0%,100% { box-shadow: 0 0 14px rgba(255,51,170,.45); }
+        50% { box-shadow: 0 0 28px rgba(255,51,170,.85), 0 0 50px rgba(170,85,255,.5); }
+    }
+    .url-box {
+        color: #7ee7ff;
+        font-size: 14px;
+        font-family: Consolas, monospace;
+        word-break: break-all;
+    }
+    .notice-box {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 51, 170, 0.5);
+        border-radius: 8px;
+        padding: 12px 14px;
+        overflow: hidden;
+        white-space: nowrap;
+        position: relative;
+    }
+    .notice-box .horn {
+        font-size: 16px;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+    .marquee {
+        display: inline-block;
+        white-space: nowrap;
+        animation: scrollLeft 22s linear infinite;
+        font-size: 14px;
+        color: #ff77c9;
+        font-weight: bold;
+        vertical-align: middle;
+        padding-left: 6px;
+    }
+    @keyframes scrollLeft {
+        0%   { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+    }
+    .update_content {
+        background: rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,51,170,0.2);
+        border-radius: 8px;
+        padding: 14px 16px;
+        font-size: 14px;
+        line-height: 2.1;
+        color: #e8e8ff;
+    }
+    .download-btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background: linear-gradient(90deg, #ff33aa, #aa55ff);
+        color: #fff;
+        font-size: 17px;
+        font-weight: bold;
+        text-decoration: none;
+        padding: 14px 0;
+        border-radius: 8px;
+        margin-top: 8px;
+        transition: all 0.25s;
+        letter-spacing: 4px;
+    }
+    .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(255, 51, 170, 0.45);
+    }
+    .footer {
+        position: relative; z-index: 1;
+        text-align: center;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: 10px;
+        letter-spacing: 1px;
+    }
+</style>
+</head>
+<body>
+
+<div class="page-title">雪之下倾城</div>
+<div class="page-sub">家庭版游戏菜单 · 版本信息页</div>
+
+<div class="card">
+    <div class="card-title">📢 滚动字体公告 <span class="tag">改这里 = 改公告</span></div>
+    <div class="notice-box">
+        <span class="horn">📢</span>
+        <div class="notice"><span class="marquee">【V7.3.12 更新】修复最小化粒子星光特效失效（重复方法定义覆盖）；图标大/中/小切换保持位置不变；天气预报自动切换粒子特效（下雨下雨、下雪下雪、晴光点）；底部胶囊显示实时温度；毛毛雨正确显示。欢迎「您」使用家庭版游戏菜单！</span></div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">🔄 版本信息 <span class="tag">改这里 = 改版本</span></div>
+    <div class="info-row">
+        <span class="info-label">最新版本</span>
+        <span class="info-value"><span class="version-badge"><span class="version">7.3.12</span></span></span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">发布日期</span>
+        <span class="info-value"><span class="release_date">2026-10-05</span></span>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">📋 更新内容 <span class="tag">改这里 = 改更新内容</span></div>
+    <div class="update_content">1. 修复最小化粒子星光特效失效（重复方法定义被覆盖）<br>2. 图标大/中/小切换保持位置不变，不再乱位<br>3. 天气预报自动切换粒子特效：下雨下雨、下雪下雪、晴天光点<br>4. 底部胶囊显示实时温度，毛毛雨正确显示<br>5. 修复托盘截图缩放版覆盖粒子星光版的问题</div>
+</div>
+
+<div class="card">
+    <div class="card-title">⬇ 下载地址 <span class="tag">改这里 = 改下载</span></div>
+    <div class="info-row">
+        <span class="info-label">下载地址</span>
+        <span class="info-value url-box"><span class="download_url">https://wwbif.lanzoum.com/b0j1q11yd</span></span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">访问密码</span>
+        <span class="info-value"><span class="download_password">70ve</span></span>
+    </div>
+    <a class="download-btn" href="https://wwbif.lanzoum.com/b0j1q11yd" target="_blank">⬇ 下载最新版本</a>
+</div>
+
+<div class="footer">雪之下倾城 · 数据来源于本网页 · 游戏菜单启动后自动获取 · 修改后重新上传覆盖即可生效</div>
+
+</body>
+</html>
