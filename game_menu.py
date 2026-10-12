@@ -3962,7 +3962,7 @@ class BackgroundWidget(QWidget):
                 y = (self.height() - scaled.height()) // 2
                 pp.drawPixmap(x, y, scaled)
                 # 叠加一层暗色蒙版保证文字可读
-                pp.fillRect(self.rect(), QColor(0, 0, 0, 80))
+                pp.fillRect(self.rect(), QColor(0, 0, 0, 40))
             else:
                 # 主题渐变背景
                 theme = THEMES.get(self.theme_key, THEMES[DEFAULT_THEME])
